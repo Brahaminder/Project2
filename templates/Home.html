@@ -1,0 +1,74 @@
+{%load crispy_forms_tags %}
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <title>Mdvrp Visualizer</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="{% static 'Home.css' %}" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  </head>
+  <body>
+    <p class = "h1" style="text-align: center; font-size:x-large;font-weight: bold; margin-top: 40px;">Enter The Test Data</p>  
+    <div style="display:flex;justify-content: center; margin-top: 40px;" class="container">
+        <form id = "form_jatin" style="text-align: center;" class="forms">
+        {% csrf_token %}
+        <div class="row">
+          {% for field in form %}
+              <div class="col-sm-6">
+                {{ field|as_crispy_field }}
+              </div>
+          {% endfor %}
+        </div>
+        <input type="submit" name = "submit" value="submit">
+        </form>
+     
+    </div>
+    <div id = "output" style="display:flex;justify-content: center;" class="container"> 
+
+    </div>
+    <script>
+     
+      $('#form_jatin').on('submit',function(e){
+            e.preventDefault();
+            $("#output").html('Processing, Please wait...');
+            $.ajax({
+                type: "POST",
+                url: "{%url 'ajax_posting' %}",
+                data: {
+                  customer_nodes: $('#id_customer_nodes').val(),
+                  depot_nodes: $('#id_depot_nodes').val(),
+                  bucket_size: $('#id_P').val(),
+                  max_vehicles: $('#id_max_vehicles').val(),
+                  iterations: $('#id_iterations').val(),
+                  max_no_improve: $('#id_max_no_improve').val(),
+                  coordinates: $('#id_Coordinate').val(),
+                  csrfmiddlewaretoken: '{{ csrf_token }}',
+                  dataType: "json",
+                },
+                success: function (response) {
+                    // on successfull creating object
+                    window.location.href = "graph";
+                },
+                error: function (response) {
+
+                    $("#output").html(response.responseJSON.Fail)
+                }
+            });
+      });
+  </script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  
+    
+  </body>
+</html>
